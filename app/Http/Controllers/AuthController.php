@@ -25,7 +25,7 @@ class AuthController extends Controller
                 "email"=>$req->email,
                 "password"=>$req->password,
                 "status"=>1
-            ],$req->remember?true:false);
+            ]);
             if($user){
                 return redirect('/')->with(['success'=>"Registration Successfully Completed."]);
             }else{
@@ -67,5 +67,10 @@ class AuthController extends Controller
             }
         }
         return view('admin.auth.register');
+    }
+
+    function logout(){
+        Auth::logout();
+        return redirect()->route('login')->with(['success'=>"You are successfully logout."]);
     }
 }

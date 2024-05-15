@@ -9,17 +9,15 @@ use Illuminate\Support\Facades\Validator;
 
 class TaskController extends Controller
 {
-    
     function taskList(){
         $data=[];
         $user_type=Auth::user()->user_type;
         if($user_type=='admin'){
-            $tasks=Task::all();
+            $tasks=Task::orderBy('id', 'desc')->get();
         }else{
-            $tasks=Task::where('user_id',Auth::user()->id)->get();
+            $tasks=Task::where('user_id',Auth::user()->id)->orderBy('id', 'desc')->get();
         }
         $data['tasks']=$tasks;
-        // dd($data);
         return view('admin.task.task_list',$data);
     }
 
@@ -58,7 +56,13 @@ class TaskController extends Controller
     function edit_task(Request $req,$id=null){
         $data=[];
         if($id){
+            $user_type=Auth::user()->user_type;
             $task=Task::find($id);
+            if(($user_type!='admin') && $task->user_id!=Auth::user()->id){
+                return redirect()->route('tasks')->with([
+                    "warning"=>"Task not found.",
+                ]);
+            }          
             $data['task']=$task;
             if($req->isMethod('post')){
                 $validator=Validator::make($req->all(),[
@@ -85,6 +89,50 @@ class TaskController extends Controller
                 "success"=>"Please check the url."
             ]);
         }
+    }
+
+    function delete_task(Request $req){
+        try {
+            $response=[
+                'status'=>false,
+                "message"=>''
+            ];
+            if($req->isMethod('post') && $req->id){
+                $id=$req->id;
+                $user_type=Auth::user()->user_type;
+                $task=Task::find($id);
+                if(($user_type!='admin') && $task->user_id!=Auth::user()->id){
+                    $response=[
+                        'status'=>false,
+                        "message"=>'You are not allowed to delete this task.'
+                    ];
+                    return response()->json($response);
+                }
+                if($task){
+                    $task->delete();
+                    $response=[
+                        'status'=>true,
+                        "message"=>'Task has been deleted successfully'
+                    ];
+                }else{
+                    $response=[
+                        'status'=>false,
+                        "message"=>'Task not found.'
+                    ];
+                }
+            }else{
+                $response=[
+                    'status'=>false,
+                    "message"=>'Invalid parameters.'
+                ];
+            }
+        }catch (\Throwable $th) {
+            $response=[
+                'status'=>false,
+                "message"=>'Something went wrong.Try Later...!'
+            ];
+        }
+        return response()->json($response);
     }
 
 }

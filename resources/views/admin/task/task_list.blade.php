@@ -11,7 +11,7 @@
         </div>
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right">
-            <li class="breadcrumb-item"><a href="#">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
             <li class="breadcrumb-item active">Task List</li>
           </ol>
         </div>
@@ -34,6 +34,7 @@
                   <th>Description</th>
                   <th>Status</th>
                   <th>Added On</th>
+                  <th>Added By</th>
                   <th>Action</th>
                 </tr>
                 </thead>
@@ -45,23 +46,14 @@
                             <td>{{$task->description}}</td>
                             <td>{{$task->status}}</td>
                             <td>{{date("Y-m-d h:i:s A",strtotime($task->created_at))}} </td>
+                            <td>{{$task->user->name}}</td>
                             <td>
                                 <a href="{{ route('edit_task', ['id'=>$task->id]) }}" class="btn btn-md btn-primary ">Edit</a>
-                                <a href="" class="btn btn-md btn-danger ">Delete</a>
+                                <a href="javascript:void(0)" data-id="{{$task->id}}" class="btn btn-md btn-danger delete_task_btn">Delete</a>
                             </td>
                         </tr>
                     @endforeach
                 </tbody>
-                <tfoot>
-                <tr>
-                    <th>Task Id</th>
-                    <th>Task Title</th>
-                    <th>Description</th>
-                    <th>Status</th>
-                    <th>Added On</th>
-                    <th>Action</th>
-                </tr>
-                </tfoot>
               </table>
             </div>
             <!-- /.card-body -->
@@ -83,9 +75,29 @@
 <script>
   $(function () {
     $("#table").DataTable({
-      "responsive": true, "lengthChange": false, "autoWidth": false,"searching": true,
+      "responsive": true,"searching": true,
     });
-    
+  });
+
+  $(document).ready(function () {
+    $(document).on('click','.delete_task_btn',function(){
+      console.log('clicked');
+      var id=$(this).data('id');
+      if(id){
+        $.ajax({
+          url:"{{route('delete_task')}}",
+          method:"post",
+          data:{id:id,_token:"{{csrf_token()}}"},
+          dataType:"json",
+          success:function(data){
+            alert(data.message);
+            if(data.status){
+              window.location.reload();
+            }
+          }
+        })
+      }
+    });
   });
 </script>
 @endsection

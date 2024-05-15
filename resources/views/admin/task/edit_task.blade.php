@@ -8,7 +8,8 @@
         </div>
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right">
-            <li class="breadcrumb-item"><a href="#">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('tasks') }}">Tasks</a></li>
             <li class="breadcrumb-item active">Edit Task</li>
           </ol>
         </div>
@@ -26,7 +27,7 @@
               <div class="row">
                 <div class="col-md-6">
                   <div class="form-group">
-                    <label for="name">Task Title</label>
+                    <label for="name">Task Title <span class="text-danger" >*</span></label>
                     <input type="text" id="title" class="form-control @error('title')
                         is-invalid
                     @enderror " name="title" value="{{old('title',$task->title??'')}}" placeholder="Enter Task Title">
@@ -37,7 +38,7 @@
                 </div>
                 <div class="col-md-3">
                   <div class="form-group">
-                    <label for="status">Status</label>
+                    <label for="status">Status <span class="text-danger" >*</span></label>
                     <select id="status" class="form-control custom-select @error('status')
                     is-invalid
                     @enderror" name="status">
@@ -59,7 +60,7 @@
                 </div>
                 <div class="col-md-3">
                   <div class="form-group">
-                    <label for="deadline">Deadline</label>
+                    <label for="deadline">Deadline <span class="text-danger" >*</span></label>
                     <input type="date" id="deadline" class="form-control @error('deadline')
                     is-invalid
                 @enderror " name="deadline" min="{{ date("Y-m-d") }}" value="{{old('deadline',$task->deadline??'')}}" placeholder="Enter Deadline">
@@ -70,7 +71,7 @@
                 </div>
                 <div class="col-md-12">
                   <div class="form-group">
-                    <label for="description">Task Description</label>
+                    <label for="description">Task Description <span class="text-danger" >*</span></label>
                     <textarea class="form-control @error('description')
                     is-invalid
                     @enderror" name="description" id="description" rows="3">{{old('description',$task->description??'')}}</textarea>
